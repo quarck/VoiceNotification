@@ -41,6 +41,13 @@ class TTSSpeaker(val service: PlayTTSService)
         return cntRussianLetters >= 0.5 * cntTotalLetters
     }
 
+    private val isDeviceInCall: Boolean
+        get() {
+            val audioManager = service.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+            val mode = audioManager.getMode()
+            return (mode == AudioManager.MODE_IN_CALL || mode == AudioManager.MODE_IN_COMMUNICATION)
+        }
+
     fun playNotification(ctx: Context, app: String, title: String, text: String) {
         synchronized(this) {
             if (app.isNotBlank())
@@ -74,13 +81,36 @@ class TTSSpeaker(val service: PlayTTSService)
         playOne()
     }
 
-    fun playOne() {
+    private fun stopImpl() {
+        ttsObject?.stop()
+        ttsObject?.shutdown()
+        ttsObject = null
+        speechQueue.clear()
+
+        service.stopForeground(true)
+    }
+
+    fun stop() {
         synchronized(this) {
-            if (speechQueue.isEmpty()) {
-                ttsObject?.stop()
-                ttsObject?.shutdown()
-                service.stopForeground(true)
-                ttsObject = null
+            stopImpl()
+        }
+    }
+
+    fun playOne() {
+
+        var shutdownTTS = false
+        if (isDeviceInCall) {
+            Thread.sleep(1000)
+            shutdownTTS = isDeviceInCall
+        }
+
+        if (PersistentState(service).muteUntil > System.currentTimeMillis()) {
+            shutdownTTS = true
+        }
+
+        synchronized(this) {
+            if (shutdownTTS || speechQueue.isEmpty()) {
+                stopImpl()
                 return
             }
 
@@ -110,13 +140,7 @@ class TTSSpeaker(val service: PlayTTSService)
     }
 
     override fun onError(utteranceId: String?) {
-        synchronized(this) {
-            service.stopForeground(true)
-
-            ttsObject?.stop()
-            ttsObject?.shutdown()
-            ttsObject = null
-        }
+        stop()
     }
 
 }
@@ -130,6 +154,10 @@ class PlayTTSService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+
+        if (intent?.getBooleanExtra("stop", false) == true) {
+            speaker.stop()
+        }
 
         val NOTIFICATION_CHANNEL = "channel0"
 

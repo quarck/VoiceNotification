@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity">
@@ -13,8 +12,12 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Enable Notification Service"
-        android:layout_margin="5pt"
+        android:layout_marginStart="5pt"
+        android:layout_marginEnd="5pt"
+        android:layout_marginTop="12pt"
+        android:layout_marginBottom="2pt"
         android:onClick="onLaunchService"
+        android:layout_alignParentTop="true"
         />
 
     <Button
@@ -22,8 +25,76 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Configure Bluetooth Devices"
-        android:layout_margin="5pt"
+        android:layout_marginStart="5pt"
+        android:layout_marginEnd="5pt"
+        android:layout_marginTop="2pt"
+        android:layout_marginBottom="2pt"
         android:onClick="onLaunchBTConfig"
+        android:layout_below="@id/buttonService"
         />
 
-</LinearLayout>
+    <Button
+        android:id="@+id/buttonMute8hrs"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Mute for 8 hours"
+        android:layout_marginStart="5pt"
+        android:layout_marginEnd="5pt"
+        android:layout_marginTop="2pt"
+        android:layout_marginBottom="12pt"
+        android:onClick="mute8Hours"
+        android:layout_alignParentBottom="true"
+        />
+
+    <Button
+        android:id="@+id/buttonMute1hr"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Mute 1 hour"
+        android:layout_marginStart="5pt"
+        android:layout_marginEnd="5pt"
+        android:layout_marginTop="2pt"
+        android:layout_marginBottom="2pt"
+        android:onClick="muteOneHour"
+        android:layout_above="@id/buttonMute8hrs"
+        />
+
+    <Button
+        android:id="@+id/buttonMute30mins"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Mute 30 minutes"
+        android:layout_marginStart="5pt"
+        android:layout_marginEnd="5pt"
+        android:layout_marginTop="2pt"
+        android:layout_marginBottom="2pt"
+        android:onClick="mute30Mins"
+        android:layout_above="@id/buttonMute1hr"
+        />
+
+    <Button
+        android:id="@+id/buttonMute15mins"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Mute 15 minutes"
+        android:layout_marginStart="5pt"
+        android:layout_marginEnd="5pt"
+        android:layout_marginTop="2pt"
+        android:layout_marginBottom="2pt"
+        android:onClick="mute15Mins"
+        android:layout_above="@id/buttonMute30mins"
+        />
+
+    <Button
+        android:id="@+id/buttonCancelMute"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Cancel Mute"
+        android:layout_marginStart="5pt"
+        android:layout_marginEnd="5pt"
+        android:layout_marginTop="2pt"
+        android:layout_marginBottom="10pt"
+        android:onClick="cancelMute"
+        android:layout_above="@id/buttonMute15mins"
+        />
+</RelativeLayout>

@@ -7,8 +7,8 @@ class BTCarModeStorage(private val ctx: Context) : PersistentStorageBase(ctx, PR
 
     private var triggerDevicesRaw by StringProperty("", "A")
 
-    var triggerDevices: List<String>
-        get() = triggerDevicesRaw.split(',').toList()
+    var triggerDevices: Set<String>
+            get() = triggerDevicesRaw.split(',').toSet()
         set(value) {
             triggerDevicesRaw = value.joinToString (",")
         }

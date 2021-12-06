@@ -120,7 +120,7 @@ class BluetoothDevicesActivity : AppCompatActivity() {
 
         adapter.onListHandledUpdated = {
                 _, newList ->
-            bluetoothManager.storage.triggerDevices = newList
+            bluetoothManager.storage.triggerDevices = newList.toSet()
         }
 
         staggeredLayoutManager = StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL)

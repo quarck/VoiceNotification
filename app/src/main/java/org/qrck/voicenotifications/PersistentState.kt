@@ -24,8 +24,7 @@ import android.content.Context
 
 class PersistentState(private val ctx: Context) : PersistentStorageBase(ctx, PREFS_NAME) {
 
-    var lastTitle by StringProperty(defaultValue = "")
-    var lastDesc by StringProperty(defaultValue = "")
+    var muteUntil by LongProperty(defaultValue = 0, storageName = "m")
 
     companion object {
         const val PREFS_NAME: String = "persistent_state"
