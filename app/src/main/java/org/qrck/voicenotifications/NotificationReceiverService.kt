@@ -44,10 +44,13 @@ class NotificationReceiverService : NotificationListenerService()
 	private var prevText: String = ""
 	private var prevTime: Long = 0
 
+	private lateinit var btManager: BTDeviceManager
+
 
 	override fun onCreate()
 	{
 		super.onCreate()
+		btManager = BTDeviceManager(this)
 	}
 
 	override fun onDestroy()
@@ -62,6 +65,9 @@ class NotificationReceiverService : NotificationListenerService()
 
 	override fun onNotificationPosted(notification: StatusBarNotification?)
 	{
+		if (!btManager.anyTriggerDevicesConnected)
+			return
+
 		if (notification != null) {
 			val packageName = notification.packageName
 
@@ -102,7 +108,7 @@ class NotificationReceiverService : NotificationListenerService()
 				intent.putExtra("title", title)
 				intent.putExtra("text", text)
 				applicationContext.startForegroundService(intent)
-			} 
+			}
 		}
 	}
 }
