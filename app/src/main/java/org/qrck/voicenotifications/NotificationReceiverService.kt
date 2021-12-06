@@ -81,16 +81,14 @@ class NotificationReceiverService : NotificationListenerService()
 			if (title.isEmpty())
 				title = notification.notification.bigTitle
 
-			if (title.length > 100)
-				title = title.substring(0, 100)
+			if (title.length > 80)
+				title = title.substring(0, 80)
 
 			var text = notification.notification.text
 			if (text.isEmpty())
 				text = notification.notification.bigText
-			if (text.length > 200)
-				text = text.substring(0, 200)
-
-			Log.d("NOTIFICATIONS_LISTENER", "What I saw: $packageName: a'${appName}' t'${notification.notification.title}' bt'${notification.notification.bigTitle}' te'${notification.notification.text}' bte'${notification.notification.bigText}'")
+			if (text.length > 160)
+				text = text.substring(0, 160)
 
 			val now = System.currentTimeMillis()
 			if (packageName != prevPkg || prevTitle != title || prevText != text || (now - prevTime > 5000)) {
@@ -99,16 +97,12 @@ class NotificationReceiverService : NotificationListenerService()
 				prevText = text
 				prevTime = now
 
-				Log.d("NOTIFICATIONS_LISTENER", "TTS-ing")
-
 				val intent = Intent(this, PlayTTSService::class.java)
 				intent.putExtra("app", appName)
 				intent.putExtra("title", title)
 				intent.putExtra("text", text)
 				applicationContext.startForegroundService(intent)
-			} else {
-				Log.d("NOTIFICATIONS_LISTENER", "Repeat notification - skipped")
-			}
+			} 
 		}
 	}
 }
