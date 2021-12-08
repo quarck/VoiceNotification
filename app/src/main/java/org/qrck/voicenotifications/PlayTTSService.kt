@@ -168,6 +168,7 @@ class PlayTTSService : Service() {
 
         if (intent?.getBooleanExtra(INTENT_STOP_CMD, false) == true) {
             speaker.stop()
+            return START_NOT_STICKY
         }
 
         val mgr = this.getSystemService(NOTIFICATION_SERVICE) as NotificationManager
