@@ -155,11 +155,9 @@ class PlayTTSService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
 
-        if (intent?.getBooleanExtra("stop", false) == true) {
+        if (intent?.getBooleanExtra(INTENT_STOP_CMD, false) == true) {
             speaker.stop()
         }
-
-        val NOTIFICATION_CHANNEL = "channel0"
 
         val mgr = this.getSystemService(NOTIFICATION_SERVICE) as NotificationManager
 
@@ -189,7 +187,7 @@ class PlayTTSService : Service() {
             Notification.Builder(this, NOTIFICATION_CHANNEL)
                 .setContentTitle("TTS Notify")
                 .setContentText("Playing notification text")
-                .setSmallIcon(R.drawable.ic_launcher_background)
+                .setSmallIcon(android.R.drawable.ic_media_play)
                 .setContentIntent(pendingIntent)
                 .setAutoCancel(true)
                 .setOngoing(false)
@@ -201,9 +199,9 @@ class PlayTTSService : Service() {
         startForeground(1, notification)
 
         playSound(
-            intent?.getStringExtra("app"),
-            intent?.getStringExtra("title"),
-            intent?.getStringExtra("text")
+            intent?.getStringExtra(INTENT_APP),
+            intent?.getStringExtra(INTENT_TITLE),
+            intent?.getStringExtra(INTENT_TEXT)
         )
 
         return START_NOT_STICKY
@@ -211,5 +209,23 @@ class PlayTTSService : Service() {
 
     private fun playSound(app: String?, title: String?, text: String?) {
         speaker.playNotification(this, app ?: "", title ?: "", text ?: "")
+    }
+
+    companion object {
+        const val INTENT_STOP_CMD = "stop"
+        const val INTENT_PKG = "pkg"
+        const val INTENT_KEY = "key"
+        const val INTENT_ID = "id"
+        const val INTENT_APP = "app"
+        const val INTENT_TITLE = "title"
+        const val INTENT_TEXT = "text"
+
+        const val NOTIFICATION_CHANNEL = "channel0"
+
+        fun stopActiveTTS(context: Context) {
+            val stopTtsIntent = Intent(context, PlayTTSService::class.java)
+            stopTtsIntent.putExtra(PlayTTSService.INTENT_STOP_CMD, true)
+            context.startService(stopTtsIntent)
+        }
     }
 }

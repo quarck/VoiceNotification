@@ -108,14 +108,14 @@ class NotificationReceiverService : NotificationListenerService()
 		if (title.isEmpty())
 			title = notification.notification.bigTitle
 
-		if (title.length > 80)
-			title = title.substring(0, 80)
+		if (title.length > 50)
+			title = title.substring(0, 47) + "..."
 
 		var text = notification.notification.text
 		if (text.isEmpty())
 			text = notification.notification.bigText
-		if (text.length > 160)
-			text = text.substring(0, 160)
+		if (text.length > 120)
+			text = text.substring(0, 117) + "..."
 
 		val now = System.currentTimeMillis()
 		if (packageName != prevPkg || prevTitle != title || prevText != text || (now - prevTime > 5000)) {
@@ -124,14 +124,59 @@ class NotificationReceiverService : NotificationListenerService()
 			prevText = text
 			prevTime = now
 
-			Log.d(LOG_TAG, "TTS-ingNotification from $packageName, $appName")
+			Log.d(LOG_TAG, "TTS-ingNotification from $packageName, $appName, key ${notification.key}, id ${notification.id}")
 
 			val intent = Intent(this, PlayTTSService::class.java)
-			intent.putExtra("app", appName)
-			intent.putExtra("title", title)
-			intent.putExtra("text", text)
+			intent.putExtra(PlayTTSService.INTENT_PKG, packageName)
+			intent.putExtra(PlayTTSService.INTENT_KEY, notification.key)
+			intent.putExtra(PlayTTSService.INTENT_ID, notification.id)
+			intent.putExtra(PlayTTSService.INTENT_APP, appName)
+			intent.putExtra(PlayTTSService.INTENT_TITLE, title)
+			intent.putExtra(PlayTTSService.INTENT_TEXT, text)
+
 			applicationContext.startForegroundService(intent)
 		}
+	}
+
+	override fun onNotificationRemoved(
+		notification: StatusBarNotification?,
+		rankingMap: RankingMap?,
+		reason: Int
+	) {
+		var interested = false
+
+		when (reason) {
+			NotificationListenerService.REASON_CLICK,
+			NotificationListenerService.REASON_CANCEL,
+			NotificationListenerService.REASON_CANCEL_ALL,
+			NotificationListenerService.REASON_CHANNEL_BANNED,
+			NotificationListenerService.REASON_SNOOZED, ->
+				interested = true
+		}
+
+		if (!interested)
+			return
+
+		if (notification == null)
+			return
+
+		if (rankingMap != null) {
+			var ranking = NotificationListenerService.Ranking()
+			if (rankingMap.getRanking(notification.key, ranking)) {
+				if (ranking.importance <= NotificationManager.IMPORTANCE_LOW) {
+					Log.d(LOG_TAG, "Skipping low importance notification for $packageName")
+					return
+				}
+			}
+		}
+
+		val packageName = notification.packageName
+		if (packageName in blacklistedPackages) {
+			return
+		}
+
+		// user did something with the notifications and it is one of ours we are interested in -- stop TTS, user can read now
+		PlayTTSService.stopActiveTTS(this)
 	}
 
 	companion object {

@@ -17,7 +17,9 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         updateView()
-        this.startService(Intent(this, PlayTTSService::class.java).putExtra("stop", true))
+
+        // wherever we open this view - we stop playing the TTS
+        PlayTTSService.stopActiveTTS(this)
     }
 
     private fun updateView() {
