@@ -9,6 +9,8 @@ import android.os.IBinder
 import android.widget.EditText
 
 import android.speech.tts.TextToSpeech
+import android.util.Log
+import org.qrck.voicenotifications.NotificationReceiverService.Companion.LOG_TAG
 import java.util.*
 
 class TTSSpeaker(val service: PlayTTSService)
@@ -68,6 +70,15 @@ class TTSSpeaker(val service: PlayTTSService)
 
         synchronized(this) {
             ttsObject?.setOnUtteranceProgressListener(this)
+
+            ttsObject?.let {
+                Log.i(LOG_TAG, "Known TTS engines: ")
+                for (e in it.engines) {
+                    Log.i(LOG_TAG, "${e.name}, ${e.label}")
+                }
+            }
+
+            ttsObject?.setSpeechRate(1.2f)
 
             val attribBuilder =
                 AudioAttributes.Builder()
