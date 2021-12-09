@@ -21,17 +21,17 @@
         />
 
     <Button
-        android:id="@+id/buttonBTService"
+        android:id="@+id/buttonSettings"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Configure Bluetooth Devices"
-        android:layout_marginStart="5pt"
-        android:layout_marginEnd="5pt"
-        android:layout_marginTop="2pt"
-        android:layout_marginBottom="2pt"
-        android:onClick="onLaunchBTConfig"
         android:layout_below="@id/buttonService"
-        />
+        android:layout_marginStart="5pt"
+        android:layout_marginTop="2pt"
+        android:layout_marginEnd="5pt"
+        android:layout_marginBottom="2pt"
+        android:onClick="onLaunchSettings"
+        android:text="Settings" />
+
 
     <Button
         android:id="@+id/buttonMute8hrs"

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+    
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/edit_list_item"
+    android:layout_width="fill_parent"
+    android:layout_height="?android:attr/listPreferredItemHeight"
+    android:padding="6dip" >
+    
+    <CheckBox
+        android:id="@+id/checkBoxShowApp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="false"
+        android:layout_alignWithParentIfMissing="true"
+        android:layout_centerVertical="true"
+        android:text=""
+        android:textSize="18sp" >
+
+    </CheckBox>
+    
+    <ImageView
+        android:id="@+id/editIcon"
+        android:layout_width="48dip"
+        android:layout_height="48dip"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="6dp"
+        android:layout_toEndOf="@+id/checkBoxShowApp"
+        android:src="@drawable/ic_launcher_foreground"
+        tools:ignore="ContentDescription" />
+    
+    <TextView
+        android:id="@+id/textViewAppName"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@id/checkBoxShowApp"
+        android:layout_alignWithParentIfMissing="true"
+        android:layout_toEndOf="@id/editIcon"
+        android:layout_alignParentEnd="true"
+        android:gravity="center_vertical"
+        android:text=""
+        android:textSize="16sp" />
+    
+</RelativeLayout>
+ 

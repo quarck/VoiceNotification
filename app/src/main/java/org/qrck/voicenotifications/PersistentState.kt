@@ -26,6 +26,9 @@ class PersistentState(private val ctx: Context) : PersistentStorageBase(ctx, PRE
 
     var muteUntil by LongProperty(defaultValue = 0, storageName = "m")
 
+    var enableSamsungTTS by BooleanProperty(defaultValue = false, storageName = "a1")
+    var enableMediaStream by BooleanProperty(defaultValue = false, storageName = "a2")
+
     companion object {
         const val PREFS_NAME: String = "persistent_state"
     }

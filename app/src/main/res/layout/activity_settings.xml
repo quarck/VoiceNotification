@@ -1,0 +1,82 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="10pt"
+    android:paddingLeft="10pt"
+    android:paddingRight="10pt"
+    android:paddingTop="10pt">
+
+
+	<Button
+		android:id="@+id/buttonSelectApps"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:layout_alignParentStart="true"
+		android:text="Select apps"
+		android:textAppearance="?android:attr/textAppearanceLarge"
+		android:layout_margin="2pt"
+		/>
+
+	<Button
+		android:id="@+id/buttonSelectDevices"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:layout_alignParentStart="true"
+		android:text="Select Devices"
+		android:textAppearance="?android:attr/textAppearanceLarge"
+		android:layout_below="@id/buttonSelectApps"
+		android:layout_margin="2pt"
+		/>
+
+	<com.google.android.material.switchmaterial.SwitchMaterial
+		android:id="@+id/switchEnableSamsungTTS"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:layout_alignParentStart="true"
+		android:text="Use Samsung TTS"
+		android:textAppearance="?android:attr/textAppearanceLarge"
+		android:layout_below="@id/buttonSelectDevices"
+		android:layout_margin="2pt"
+		/>
+
+	<com.google.android.material.switchmaterial.SwitchMaterial
+		android:id="@+id/switchUseMediaStream"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:layout_alignParentStart="true"
+		android:text="Use Media Stream"
+		android:textAppearance="?android:attr/textAppearanceLarge"
+		android:layout_below="@id/switchEnableSamsungTTS"
+		android:layout_margin="2pt"
+		/>
+
+    <TextView
+	    android:id="@+id/textViewLblEnablePerAppSmallprint"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_alignStart="@+id/listApplications"
+        android:layout_below="@+id/switchUseMediaStream"
+	    android:text="Select Apps"
+	    android:textAppearance="?android:attr/textAppearanceSmall" />
+
+	<ListView
+		android:id="@+id/listApplications"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:layout_below="@+id/textViewLblEnablePerAppSmallprint"
+		android:layout_alignParentStart="true"
+		android:layout_alignParentEnd="true" />
+	
+	<TextView
+	    android:id="@+id/textViewLonelyHere"
+	    android:layout_width="fill_parent"
+	    android:layout_height="wrap_content"
+		android:layout_alignParentStart="true"
+		android:layout_alignParentEnd="true"
+	    android:layout_centerVertical="true"
+	    android:text="No apps"
+	    android:textAppearance="?android:attr/textAppearanceMedium"
+	    android:visibility="visible" />
+	
+</RelativeLayout>

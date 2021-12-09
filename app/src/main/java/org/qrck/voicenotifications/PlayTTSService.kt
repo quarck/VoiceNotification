@@ -59,8 +59,13 @@ class TTSSpeaker(val service: PlayTTSService)
             if (text.isNotBlank())
                 speechQueue.add(text)
 
-            if (ttsObject == null)
-                ttsObject = TextToSpeech(ctx, this)
+            if (ttsObject == null) {
+                val state = PersistentState(service)
+                if (state.enableSamsungTTS)
+                    ttsObject = TextToSpeech(ctx, this, "com.samsung.SMT")
+                else
+                    ttsObject = TextToSpeech(ctx, this)
+            }
         }
     }
 
@@ -80,12 +85,18 @@ class TTSSpeaker(val service: PlayTTSService)
 
             ttsObject?.setSpeechRate(1.2f)
 
-            val attribBuilder =
-                AudioAttributes.Builder()
+            val attribBuilder = AudioAttributes.Builder()
                     .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
-                    .setLegacyStreamType(AudioManager.STREAM_VOICE_CALL)
-                    .setUsage(AudioAttributes.USAGE_VOICE_COMMUNICATION)
                     .setAllowedCapturePolicy(AudioAttributes.ALLOW_CAPTURE_BY_SYSTEM)
+
+            val state = PersistentState(service)
+            if (state.enableMediaStream) {
+                attribBuilder.setLegacyStreamType(AudioManager.STREAM_NOTIFICATION)
+                    .setUsage(AudioAttributes.USAGE_NOTIFICATION_COMMUNICATION_INSTANT)
+            } else {
+                attribBuilder.setLegacyStreamType(AudioManager.STREAM_VOICE_CALL)
+                    .setUsage(AudioAttributes.USAGE_VOICE_COMMUNICATION)
+            }
 
             ttsObject?.setAudioAttributes(attribBuilder.build())
         }

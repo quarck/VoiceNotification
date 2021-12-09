@@ -72,4 +72,9 @@ class MainActivity : AppCompatActivity() {
     fun cancelMute(view: android.view.View) {
         muteFor(-1)
     }
+
+    fun onLaunchSettings(view: android.view.View) {
+        val intent = Intent(this, SettingsActivity::class.java)
+        startActivity(intent)
+    }
 }

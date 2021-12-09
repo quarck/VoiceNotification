@@ -1,0 +1,32 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    >
+
+    <TextView
+        android:id="@+id/textViewLblEnableApp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="6dp"
+        android:layout_marginRight="6dp"
+        android:text="Show/Hide:"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
+	
+	<ListView
+	    android:id="@+id/listAddApplications"
+	    android:layout_width="fill_parent"
+	    android:layout_height="fill_parent"/>
+
+	<ProgressBar
+	    android:id="@+id/progressBarLoading"
+	    android:layout_width="wrap_content"
+	    android:layout_height="match_parent"
+	    android:layout_gravity="center_vertical|center_horizontal|center"
+	    android:layout_weight="55"
+	    android:indeterminate="true"
+	    android:visibility="gone"
+	    tools:ignore="InefficientWeight" />
+
+</LinearLayout>

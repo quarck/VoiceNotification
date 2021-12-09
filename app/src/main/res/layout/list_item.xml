@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/list_item"
+    android:layout_width="fill_parent"
+    android:layout_height="?android:attr/listPreferredItemHeight"
+    android:padding="6dip" >
+    <ImageView
+        android:id="@+id/icon"
+        android:layout_width="48dip"
+        android:layout_height="48dip"
+        android:layout_alignParentTop="true"
+        android:layout_marginEnd="6dip"
+
+        android:src="@drawable/ic_launcher_foreground" />
+    
+    <ToggleButton
+        android:id="@+id/toggleButtonEnableForApp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentTop="true"
+        android:focusable="false"
+        android:focusableInTouchMode="false"
+        android:text=""
+        android:textOff="Off"
+        android:textOn="On"
+        android:textSize="18sp" >
+
+        <requestFocus/>
+    </ToggleButton>
+
+    <TextView
+        android:id="@+id/textViewAppName"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignWithParentIfMissing="true"
+        android:layout_alignBaseline="@+id/toggleButtonEnableForApp"
+        android:layout_toEndOf="@id/icon"
+        android:layout_toStartOf="@id/toggleButtonEnableForApp"
+        android:gravity="center_vertical"
+        android:text=""
+        android:textSize="16sp" />
+    
+    
+    
+    <TextView
+        android:id="@+id/textViewIntervalLabel"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_toEndOf="@id/icon"
+        android:layout_toStartOf="@id/toggleButtonEnableForApp"
+		android:layout_alignParentBottom="true"
+        android:ellipsize="marquee"
+        android:singleLine="true"
+        android:text=""
+        android:textSize="12sp" />
+        
+    
+    
+</RelativeLayout>
+ 

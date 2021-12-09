@@ -47,24 +47,24 @@ class NotificationReceiverService : NotificationListenerService()
 
 	private lateinit var btManager: BTDeviceManager
 
+	private lateinit var pkgSettings: PackageSettings
+
 	private var blacklistedPackages = setOf(
 		BuildConfig.APPLICATION_ID,
 		"com.android.systemui"
 	)
 
-	override fun onCreate()
-	{
+	override fun onCreate() {
 		super.onCreate()
 		btManager = BTDeviceManager(this)
+		pkgSettings = PackageSettings(this)
 	}
 
-	override fun onDestroy()
-	{
+	override fun onDestroy() {
 		super.onDestroy()
 	}
 
-	override fun onBind(intent: Intent): IBinder?
-	{
+	override fun onBind(intent: Intent): IBinder? {
 		return super.onBind(intent)
 	}
 
@@ -85,6 +85,11 @@ class NotificationReceiverService : NotificationListenerService()
 
 		val packageName = notification.packageName
 		if (packageName in blacklistedPackages) {
+			return
+		}
+
+		val pkg = pkgSettings.getPackage(packageName)
+		if (pkg == null || !pkg.isHandlingThis) {
 			return
 		}
 
@@ -172,6 +177,11 @@ class NotificationReceiverService : NotificationListenerService()
 
 		val packageName = notification.packageName
 		if (packageName in blacklistedPackages) {
+			return
+		}
+
+		val pkg = pkgSettings.getPackage(packageName)
+		if (pkg == null || !pkg.isHandlingThis) {
 			return
 		}
 
