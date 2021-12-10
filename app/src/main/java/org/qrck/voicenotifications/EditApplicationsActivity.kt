@@ -209,7 +209,7 @@ class ListApplicationsAdapter(
 		}
 
 
-		viewHolder?.btnShowHide?.isChecked = pkgSettings.getIsListed(appInfo?.packageName ?: "") 
+		viewHolder?.btnShowHide?.isChecked = pkgSettings.getIsListed(appInfo?.packageName ?: "")
 
 		if (appInfo?.name != null)
 			viewHolder?.textViewAppName?.text = appInfo.name

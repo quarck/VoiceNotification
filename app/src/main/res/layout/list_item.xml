@@ -13,7 +13,8 @@
         android:layout_marginEnd="6dip"
 
         android:src="@drawable/ic_launcher_foreground" />
-    
+
+
     <ToggleButton
         android:id="@+id/toggleButtonEnableForApp"
         android:layout_width="wrap_content"
@@ -26,8 +27,21 @@
         android:textOff="Off"
         android:textOn="On"
         android:textSize="18sp" >
-
         <requestFocus/>
+    </ToggleButton>
+
+    <ToggleButton
+        android:id="@+id/toggleButtonOnlyAppName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_toStartOf="@id/toggleButtonEnableForApp"
+        android:focusable="false"
+        android:focusableInTouchMode="false"
+        android:text=""
+        android:textOff="Full"
+        android:textOn="Name"
+        android:textSize="18sp" >
     </ToggleButton>
 
     <TextView

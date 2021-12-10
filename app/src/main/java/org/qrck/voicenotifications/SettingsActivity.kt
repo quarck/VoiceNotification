@@ -199,49 +199,7 @@ class SettingsActivity : Activity() {
 
 		fun onItemClicked(position: Int) {
 			Log.d(TAG, "ListApplicationsAdapter::onItemClicked, pos=" + position)
-
-			val appInfo = listApplications[position]
-
-//			val alert = AlertDialog.Builder(this@SettingsActivity)
-//
-//			alert.setTitle("Remind interval")
-//
-//			val inflater = this@SettingsActivity.layoutInflater
-//
-//			val dialogView = inflater.inflate(R.layout.dlg_remind_interval, null)
-//
-//			alert.setView(dialogView)
-//
-//			val picker = dialogView.findViewById(R.id.numberPickerRemindInterval) as NumberPicker
-//
-//			picker.minValue = 1
-//			picker.maxValue = 120
-//			picker.value = appInfo.pkgInfo!!.remindIntervalSeconds / 60
-//
-//			alert.setPositiveButton(android.R.string.ok) {
-//				x,y ->
-//				val interval = picker.value
-//
-//				Log.d(TAG, "got val: " + interval)//value.toString());
-//
-//				try
-//				{
-//					appInfo.pkgInfo!!.remindIntervalSeconds = interval * 60
-//					pkgSettings!!.updatePackage(appInfo.pkgInfo!!)
-//
-//					Log.d(TAG, "remind interval updated to " + interval + " for package " + appInfo.pkgInfo)
-//				}
-//				catch (ex: Exception)
-//				{
-//					ex.printStackTrace()
-//				}
-//
-//				notifyDataSetChanged()
-//			}
-//
-//			alert.setNegativeButton(android.R.string.cancel) { x,y ->  }
-//
-//			alert.show()
+			//val appInfo = listApplications[position]
 		}
 
 		override fun getCount(): Int {
@@ -281,6 +239,7 @@ class SettingsActivity : Activity() {
 				viewHolder.textViewAppName = rowView.findViewById(R.id.textViewAppName) as TextView
 				viewHolder.imageViewAppIcon = rowView.findViewById(R.id.icon) as ImageView
 				viewHolder.btnEnableForApp = rowView.findViewById(R.id.toggleButtonEnableForApp) as ToggleButton
+				viewHolder.btnOnlyAppName = rowView.findViewById(R.id.toggleButtonOnlyAppName) as ToggleButton
 
 				rowView.tag = viewHolder
 			}
@@ -288,9 +247,10 @@ class SettingsActivity : Activity() {
 			val appInfo = listApplications[position] // this would not change as well - why lookup twice then?
 
 			viewHolder.btnEnableForApp?.isChecked = appInfo.pkgInfo.isHandlingThis
+			viewHolder.btnOnlyAppName?.isChecked = appInfo.pkgInfo.onlyAnnounceAppName
 
 //			val text = getString(R.string.every_nmin_fmt).format((appInfo.pkgInfo.remindIntervalSeconds / 60))
-			viewHolder.textViewRemindInterval?.setText("_temp_")
+			viewHolder.textViewRemindInterval?.setText("")
 
 			if (appInfo.name.isNotBlank())
 				viewHolder.textViewAppName?.text = appInfo.name
@@ -301,15 +261,21 @@ class SettingsActivity : Activity() {
 				viewHolder.imageViewAppIcon!!.setImageDrawable(appInfo.icon)
 
 			viewHolder.btnEnableForApp?.isEnabled = true
+			viewHolder.btnOnlyAppName?.isEnabled = true
 			viewHolder.textViewRemindInterval?.isEnabled = true
 			viewHolder.imageViewAppIcon?.isEnabled = true
 			viewHolder.textViewAppName?.isEnabled = true
 
-			viewHolder.btnEnableForApp!!.setOnClickListener {
+			viewHolder.btnEnableForApp?.setOnClickListener {
 				btn ->
-				Log.d(TAG, "saveSettingsOnClickListener.onClick()")
-
 				appInfo.pkgInfo.isHandlingThis = (btn as ToggleButton).isChecked
+				pkgSettings.updatePackage(appInfo.pkgInfo)
+				notifyDataSetChanged()
+			}
+
+			viewHolder.btnOnlyAppName?.setOnClickListener {
+				btn ->
+				appInfo.pkgInfo.onlyAnnounceAppName = (btn as ToggleButton).isChecked
 				pkgSettings.updatePackage(appInfo.pkgInfo)
 				notifyDataSetChanged()
 			}
@@ -317,9 +283,9 @@ class SettingsActivity : Activity() {
 			return rowView!!
 		}
 
-		inner class ViewHolder
-		{
+		inner class ViewHolder {
 			internal var btnEnableForApp: ToggleButton? = null
+			internal var btnOnlyAppName: ToggleButton? = null
 			internal var textViewRemindInterval: TextView? = null
 			internal var textViewAppName: TextView? = null
 			internal var imageViewAppIcon: ImageView? = null
