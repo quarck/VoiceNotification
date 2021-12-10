@@ -135,9 +135,16 @@ class NotificationReceiverService : NotificationListenerService()
 			intent.putExtra(PlayTTSService.INTENT_PKG, packageName)
 			intent.putExtra(PlayTTSService.INTENT_KEY, notification.key)
 			intent.putExtra(PlayTTSService.INTENT_ID, notification.id)
+
 			intent.putExtra(PlayTTSService.INTENT_APP, appName)
-			intent.putExtra(PlayTTSService.INTENT_TITLE, title)
-			intent.putExtra(PlayTTSService.INTENT_TEXT, text)
+
+			if (!pkg.onlyAnnounceAppName) {
+				intent.putExtra(PlayTTSService.INTENT_TITLE, title)
+				intent.putExtra(PlayTTSService.INTENT_TEXT, text)
+			} else {
+				intent.putExtra(PlayTTSService.INTENT_TITLE, "")
+				intent.putExtra(PlayTTSService.INTENT_TEXT, "")
+			}
 
 			applicationContext.startForegroundService(intent)
 		}
