@@ -4,6 +4,8 @@ import android.app.*
 import android.content.Context
 import android.content.Intent
 import android.media.AudioAttributes
+import android.media.AudioDeviceCallback
+import android.media.AudioDeviceInfo
 import android.media.AudioManager
 import android.os.IBinder
 import android.widget.EditText
@@ -76,26 +78,16 @@ class TTSSpeaker(val service: PlayTTSService)
         synchronized(this) {
             ttsObject?.setOnUtteranceProgressListener(this)
 
-            ttsObject?.let {
-                Log.i(LOG_TAG, "Known TTS engines: ")
-                for (e in it.engines) {
-                    Log.i(LOG_TAG, "${e.name}, ${e.label}")
-                }
-            }
-
-            ttsObject?.setSpeechRate(1.2f)
-
-            val attribBuilder = AudioAttributes.Builder()
-                    .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
+            val attribBuilder =
+                AudioAttributes.Builder()
                     .setAllowedCapturePolicy(AudioAttributes.ALLOW_CAPTURE_BY_SYSTEM)
+                    .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
 
             val state = PersistentState(service)
             if (state.enableMediaStream) {
-                attribBuilder.setLegacyStreamType(AudioManager.STREAM_NOTIFICATION)
-                    .setUsage(AudioAttributes.USAGE_NOTIFICATION_COMMUNICATION_INSTANT)
+                attribBuilder.setUsage(AudioAttributes.USAGE_ASSISTANT)
             } else {
-                attribBuilder.setLegacyStreamType(AudioManager.STREAM_VOICE_CALL)
-                    .setUsage(AudioAttributes.USAGE_VOICE_COMMUNICATION)
+                attribBuilder.setUsage(AudioAttributes.USAGE_VOICE_COMMUNICATION)
             }
 
             ttsObject?.setAudioAttributes(attribBuilder.build())
@@ -118,14 +110,15 @@ class TTSSpeaker(val service: PlayTTSService)
         }
     }
 
-    fun playOne() {
-
+    private fun playOne() {
+        // Device is suddenly in a call - stop playing anything
         var shutdownTTS = false
         if (isDeviceInCall) {
             Thread.sleep(1000)
             shutdownTTS = isDeviceInCall
         }
 
+        // User has muted us - stop
         if (PersistentState(service).muteUntil > System.currentTimeMillis()) {
             shutdownTTS = true
         }
@@ -164,15 +157,36 @@ class TTSSpeaker(val service: PlayTTSService)
     override fun onError(utteranceId: String?) {
         stop()
     }
-
 }
 
 class PlayTTSService : Service() {
 
-    var speaker = TTSSpeaker(this)
+    private val speaker: TTSSpeaker by lazy { TTSSpeaker(this) }
+    private val btManager: BTDeviceManager by lazy { BTDeviceManager(this) }
+    private val audioManager: AudioManager by lazy { getSystemService(Context.AUDIO_SERVICE) as AudioManager }
+
+    var audioDeviceCallback = object : AudioDeviceCallback() {
+        override fun onAudioDevicesRemoved(removedDevices: Array<out AudioDeviceInfo>?) {
+            super.onAudioDevicesRemoved(removedDevices)
+            // Trigger device(s) are no longer connected - stop
+            if (!btManager.anyTriggerDevicesConnected) {
+                speaker.stop()
+            }
+        }
+    }
 
     override fun onBind(intent: Intent?): IBinder? {
         return null
+    }
+
+    override fun onCreate() {
+        super.onCreate()
+        audioManager.registerAudioDeviceCallback(audioDeviceCallback, null)
+    }
+
+    override fun onDestroy() {
+        audioManager.unregisterAudioDeviceCallback(audioDeviceCallback)
+        super.onDestroy()
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -219,6 +233,7 @@ class PlayTTSService : Service() {
 
         val notification = builder.build()
 
+        Log.d(LOG_TAG, "Foreground notification is being posted now!")
         startForeground(1, notification)
 
         playSound(
