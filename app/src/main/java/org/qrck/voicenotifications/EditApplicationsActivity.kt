@@ -209,7 +209,7 @@ class ListApplicationsAdapter(
 		}
 
 
-		viewHolder?.btnShowHide?.isChecked = pkgSettings.getIsListed(appInfo?.packageName ?: "") ?: false
+		viewHolder?.btnShowHide?.isChecked = pkgSettings.getIsListed(appInfo?.packageName ?: "") 
 
 		if (appInfo?.name != null)
 			viewHolder?.textViewAppName?.text = appInfo.name
@@ -230,7 +230,7 @@ class ListApplicationsAdapter(
 			Log.d(TAG, "saveSettingsOnClickListener.onClick()")
 
 			if ((btn as CheckBox).isChecked) {
-				pkgSettings.lookupEverywhereAndMoveOrInsertNew(appInfo?.packageName ?: "", true, 0)
+				pkgSettings.lookupEverywhereAndMoveOrInsertNew(appInfo?.packageName ?: "", true, false)
 			} else {
 				// must hide
 				val pkg = pkgSettings.getPackage(appInfo?.packageName ?: "")

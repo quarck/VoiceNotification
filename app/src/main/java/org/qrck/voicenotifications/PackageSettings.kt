@@ -36,65 +36,33 @@ import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import android.util.Log
 
-class PackageSettings(context: Context) : SQLiteOpenHelper(context, PackageSettings.DATABASE_NAME, null, PackageSettings.DATABASE_VERSION)
-{
+class PackageSettings(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
 
-	inner class Package
-	{
-		// Java boilerplate
-		var packageName: String? = null
+	data class Package(
+		var packageName: String? = null,
+		var isHandlingThis: Boolean = false,
+		var onlyAnnounceAppName: Boolean = false
+	)
 
-		// Java boilerplate
-		var isHandlingThis: Boolean = false
 
-		// Java boilerplate
-		var remindIntervalSeconds: Int = 0
+	private val COLUMNS = arrayOf<String>(KEY_PACKAGE, KEY_HANDLE, KEY_ONLY_ANNOUNCE_NAME)
 
-		constructor()
-		{
-		}
+	override fun onCreate(db: SQLiteDatabase)  {
 
-		constructor(_packageName: String, _handleThis: Boolean, _interval: Int) : super()
-		{
-			var _interval = _interval
-			if (_interval == 0)
-				_interval = DEFAULT_REMIND_INTERVAL
-			packageName = _packageName
-			isHandlingThis = _handleThis
-			remindIntervalSeconds = _interval
-		}
+		val createMainTableQuery = "CREATE TABLE $TABLE_NAME ( $KEY_PACKAGE TEXT PRIMARY KEY, $KEY_HANDLE INTEGER, $KEY_ONLY_ANNOUNCE_NAME INTEGER )"
+		Log.d(LOG_TAG, "Creating DB TABLE using query: " + createMainTableQuery)
+		db.execSQL(createMainTableQuery)
 
-		override fun toString(): String
-		{
-			return "Package [package=$packageName, handle=$isHandlingThis, interval=$remindIntervalSeconds]"
-		}
+		val createInactivePackagesTableQuery = "CREATE TABLE $TABLE_DISABLED_NAME ( $KEY_PACKAGE TEXT PRIMARY KEY, $KEY_HANDLE INTEGER, $KEY_ONLY_ANNOUNCE_NAME INTEGER )"
+		Log.d(LOG_TAG, "Creating DB TABLE_DISABLED using query: " + createInactivePackagesTableQuery)
+		db.execSQL(createInactivePackagesTableQuery)
+
+		val createIndexQuery = "CREATE UNIQUE INDEX $INDEX_NAME ON $TABLE_NAME ($KEY_PACKAGE)"
+		Log.d(LOG_TAG, "Creating DB INDEX using query: " + createIndexQuery)
+		db.execSQL(createIndexQuery)
 	}
 
-	private val COLUMNS = arrayOf<String>(KEY_PACKAGE, KEY_HANDLE, KEY_INTERVAL)
-
-	override fun onCreate(db: SQLiteDatabase)
-	{
-		var CREATE_PKG_TABLE = "CREATE TABLE $TABLE_NAME ( $KEY_PACKAGE TEXT PRIMARY KEY, $KEY_HANDLE INTEGER, $KEY_INTERVAL INTEGER )"
-
-		Log.d(LOG_TAG, "Creating DB TABLE using query: " + CREATE_PKG_TABLE)
-
-		db.execSQL(CREATE_PKG_TABLE)
-
-		CREATE_PKG_TABLE = "CREATE TABLE $TABLE_DISABLED_NAME ( $KEY_PACKAGE TEXT PRIMARY KEY, $KEY_HANDLE INTEGER, $KEY_INTERVAL INTEGER )"
-
-		Log.d(LOG_TAG, "Creating DB TABLE_DISABLED using query: " + CREATE_PKG_TABLE)
-
-		db.execSQL(CREATE_PKG_TABLE)
-
-		val CREATE_INDEX = "CREATE UNIQUE INDEX $INDEX_NAME ON $TABLE_NAME ($KEY_PACKAGE)"
-
-		Log.d(LOG_TAG, "Creating DB INDEX using query: " + CREATE_INDEX)
-
-		db.execSQL(CREATE_INDEX)
-	}
-
-	override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int)
-	{
+	override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
 		Log.d(LOG_TAG, "DROPPING table and index")
 		db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME)
 		db.execSQL("DROP TABLE IF EXISTS " + TABLE_DISABLED_NAME)
@@ -102,8 +70,7 @@ class PackageSettings(context: Context) : SQLiteOpenHelper(context, PackageSetti
 		this.onCreate(db)
 	}
 
-	fun addPackage(tableName: String, pkg: Package)
-	{
+	private fun addPackage(tableName: String, pkg: Package) {
 		Log.d(LOG_TAG, "addPackage " + pkg.toString())
 
 		val db = this.writableDatabase
@@ -111,7 +78,7 @@ class PackageSettings(context: Context) : SQLiteOpenHelper(context, PackageSetti
 		val values = ContentValues()
 		values.put(KEY_PACKAGE, pkg.packageName)
 		values.put(KEY_HANDLE, pkg.isHandlingThis)
-		values.put(KEY_INTERVAL, pkg.remindIntervalSeconds)
+		values.put(KEY_ONLY_ANNOUNCE_NAME, if (pkg.onlyAnnounceAppName) 1 else 0)
 
 		db.insert(tableName, // table
 			null, // nullColumnHack
@@ -121,20 +88,15 @@ class PackageSettings(context: Context) : SQLiteOpenHelper(context, PackageSetti
 		db.close()
 	}
 
-	fun isPackageHandled(packageId: String): Boolean
-	{
+	fun isPackageHandled(packageId: String): Boolean {
 		val pkg = getPackage(TABLE_NAME, packageId)
-
 		return pkg != null && pkg.isHandlingThis
 	}
 
-	fun getPackage(packageId: String): Package?
-	{
-		return getPackage(TABLE_NAME, packageId)
-	}
+	fun getPackage(packageId: String) = getPackage(TABLE_NAME, packageId)
 
-	fun getPackage(tableName: String, packageId: String): Package?
-	{
+	private fun getPackage(tableName: String, packageId: String): Package? {
+
 		val db = this.readableDatabase
 
 		Log.d(LOG_TAG, "getPackage" + packageId)
@@ -150,11 +112,12 @@ class PackageSettings(context: Context) : SQLiteOpenHelper(context, PackageSetti
 
 		var pkg: Package? = null
 
-		if (cursor != null && cursor.count >= 1)
-		{
+		if (cursor != null && cursor.count >= 1) {
 			cursor.moveToFirst()
-
-			pkg = Package(cursor.getString(0), Integer.parseInt(cursor.getString(1)) != 0, Integer.parseInt(cursor.getString(2)))
+			val pkgName = cursor.getString(0)
+			val handleThis = Integer.parseInt(cursor.getString(1)) != 0
+			val onlyAnnounceAppName =Integer.parseInt(cursor.getString(2)) != 0
+			pkg = Package(pkgName, handleThis, onlyAnnounceAppName)
 		}
 
 		cursor?.close()
@@ -172,14 +135,14 @@ class PackageSettings(context: Context) : SQLiteOpenHelper(context, PackageSetti
 			val db = this.writableDatabase
 			val cursor = db.rawQuery(query, null)
 
-			var pkg: Package? = null
 			if (cursor.moveToFirst())
 			{
 				do
 				{
-					pkg = Package(cursor.getString(0), Integer.parseInt(cursor.getString(1)) != 0, Integer.parseInt(cursor.getString(2)))
-
-					packages.add(pkg)
+					val pkgName = cursor.getString(0)
+					val handleThis = Integer.parseInt(cursor.getString(1)) != 0
+					val onlyAnnounceAppName =Integer.parseInt(cursor.getString(2)) != 0
+					packages.add(Package(pkgName, handleThis, onlyAnnounceAppName))
 				} while (cursor.moveToNext())
 
 				cursor.close()
@@ -189,8 +152,7 @@ class PackageSettings(context: Context) : SQLiteOpenHelper(context, PackageSetti
 		}
 
 	val isEmpty: Boolean
-		get()
-		{
+		get() {
 			var ret = true
 
 			val query = "SELECT COUNT($KEY_PACKAGE) FROM $TABLE_NAME"
@@ -198,8 +160,7 @@ class PackageSettings(context: Context) : SQLiteOpenHelper(context, PackageSetti
 			val db = this.writableDatabase
 			val cursor = db.rawQuery(query, null)
 
-			if (cursor.moveToFirst())
-			{
+			if (cursor.moveToFirst()) {
 				val count = Integer.parseInt(cursor.getString(0))
 				ret = (count == 0)
 
@@ -209,19 +170,17 @@ class PackageSettings(context: Context) : SQLiteOpenHelper(context, PackageSetti
 			return ret
 		}
 
-	fun updatePackage(pkg: Package): Int
-	{
+	fun updatePackage(pkg: Package): Int {
 		return updatePackage(TABLE_NAME, pkg)
 	}
 
-	fun updatePackage(tableName: String, pkg: Package): Int
-	{
+	fun updatePackage(tableName: String, pkg: Package): Int {
 		val db = this.writableDatabase
 
 		val values = ContentValues()
 		// values.put(KEY_PACKAGE, pkg.getPackageName());
 		values.put(KEY_HANDLE, pkg.isHandlingThis)
-		values.put(KEY_INTERVAL, pkg.remindIntervalSeconds)
+		values.put(KEY_ONLY_ANNOUNCE_NAME, if (pkg.onlyAnnounceAppName) 1 else 0)
 
 		val i = db.update(tableName, // table
 			values, // column/value
@@ -233,8 +192,7 @@ class PackageSettings(context: Context) : SQLiteOpenHelper(context, PackageSetti
 		return i
 	}
 
-	fun deletePackage(tableName: String, pkg: Package)
-	{
+	private fun deletePackage(tableName: String, pkg: Package) {
 		val db = this.writableDatabase
 
 		db.delete(TABLE_NAME, // table name
@@ -247,61 +205,44 @@ class PackageSettings(context: Context) : SQLiteOpenHelper(context, PackageSetti
 	}
 
 
-	operator fun set(packageName: String, delay: Int, enabled: Boolean)
-	{
+	operator fun set(packageName: String, enabled: Boolean, onlyAnnounceAppName: Boolean) {
 		val pkg = getPackage(TABLE_NAME, packageName)
 
 		if (pkg == null)
 		{
-			Log.d(LOG_TAG, "Added reminde for $packageName enabled: $enabled delay: $delay")
-			addPackage(TABLE_NAME, Package(packageName, enabled, delay))
+			Log.d(LOG_TAG, "Added reminde for $packageName enabled: $enabled onlyAnnounceAppName: $onlyAnnounceAppName")
+			addPackage(TABLE_NAME, Package(packageName, enabled, onlyAnnounceAppName))
 		}
 		else
 		{
-			Log.d(LOG_TAG, "Updating reminder for $packageName enabled: $enabled delay: $delay")
-			pkg.remindIntervalSeconds = delay
+			Log.d(LOG_TAG, "Updating reminder for $packageName enabled: $enabled onlyAnnounceAppName: $onlyAnnounceAppName")
+			pkg.onlyAnnounceAppName = onlyAnnounceAppName
 			pkg.isHandlingThis = enabled
 			updatePackage(TABLE_NAME, pkg)
 		}
 	}
 
-	fun getIsListed(packageName: String): Boolean
-	{
-		val pkg = getPackage(TABLE_NAME, packageName)
-		return pkg != null
-	}
+	fun getIsListed(packageName: String): Boolean =
+		getPackage(TABLE_NAME, packageName) != null
 
-	fun getIsHandled(packageName: String): Boolean
-	{
-		val pkg = getPackage(TABLE_NAME, packageName)
-		return if (pkg != null) pkg.isHandlingThis else false
-	}
+	fun getIsHandled(packageName: String): Boolean =
+		getPackage(TABLE_NAME, packageName)?.isHandlingThis ?: false
 
-	fun getInterval(packageName: String): Int
-	{
-		val pkg = getPackage(TABLE_NAME, packageName)
-		return if (pkg != null) pkg.remindIntervalSeconds else DEFAULT_REMIND_INTERVAL
-	}
+	fun getOnlyAnnounceName(packageName: String): Boolean =
+		getPackage(TABLE_NAME, packageName)?.onlyAnnounceAppName ?: false
 
-	fun lookupEverywhereAndMoveOrInsertNew(packageName: String, _handleThis: Boolean, _interval: Int): Package
-	{
+	fun lookupEverywhereAndMoveOrInsertNew(packageName: String, _handleThis: Boolean, onlyAnnounceAppName: Boolean): Package {
 		var pkg = getPackage(TABLE_NAME, packageName)
 
-		if (pkg != null)
-		{
+		if (pkg != null) {
 			// nothing to do, it is already inside the main table
-		}
-		else
-		{
+		} else {
 			pkg = getPackage(TABLE_DISABLED_NAME, packageName)
 
-			if (pkg != null)
-			{
+			if (pkg != null) {
 				deletePackage(TABLE_DISABLED_NAME, pkg) // delete it from the "disabled" table
-			}
-			else
-			{
-				pkg = Package(packageName, _handleThis, _interval)
+			} else {
+				pkg = Package(packageName, _handleThis, onlyAnnounceAppName)
 			}
 
 			addPackage(TABLE_NAME, pkg)
@@ -310,17 +251,13 @@ class PackageSettings(context: Context) : SQLiteOpenHelper(context, PackageSetti
 		return pkg
 	}
 
-	fun hidePackage(pkg: Package)
-	{
+	fun hidePackage(pkg: Package) {
 		deletePackage(TABLE_NAME, pkg)
 		addPackage(TABLE_DISABLED_NAME, pkg)
 	}
 
-	companion object
-	{
+	companion object {
 		private val LOG_TAG = "DB"
-
-		val DEFAULT_REMIND_INTERVAL = 5 * 60
 
 		private val DATABASE_VERSION = 5
 
@@ -333,6 +270,6 @@ class PackageSettings(context: Context) : SQLiteOpenHelper(context, PackageSetti
 		// private static final String KEY_ID = "id";
 		private val KEY_PACKAGE = "package"
 		private val KEY_HANDLE = "handle"
-		private val KEY_INTERVAL = "interval"
+		private val KEY_ONLY_ANNOUNCE_NAME = "interval"
 	}
 }
