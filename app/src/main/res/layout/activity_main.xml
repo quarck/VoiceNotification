@@ -32,6 +32,29 @@
         android:onClick="onLaunchSettings"
         android:text="Settings" />
 
+    <Button
+        android:id="@+id/buttonDevices"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/buttonSettings"
+        android:layout_marginStart="5pt"
+        android:layout_marginTop="2pt"
+        android:layout_marginEnd="5pt"
+        android:layout_marginBottom="2pt"
+        android:onClick="onLaunchDevices"
+        android:text="Devices" />
+
+    <Button
+        android:id="@+id/buttonApplications"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/buttonDevices"
+        android:layout_marginStart="5pt"
+        android:layout_marginTop="2pt"
+        android:layout_marginEnd="5pt"
+        android:layout_marginBottom="2pt"
+        android:onClick="onLaunchApps"
+        android:text="Apps" />
 
     <Button
         android:id="@+id/buttonMute8hrs"
@@ -89,12 +112,11 @@
         android:id="@+id/buttonCancelMute"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Cancel Mute"
+        android:layout_above="@id/buttonMute15mins"
         android:layout_marginStart="5pt"
-        android:layout_marginEnd="5pt"
         android:layout_marginTop="2pt"
+        android:layout_marginEnd="5pt"
         android:layout_marginBottom="10pt"
         android:onClick="cancelMute"
-        android:layout_above="@id/buttonMute15mins"
-        />
+        android:text="Cancel Mute" />
 </RelativeLayout>

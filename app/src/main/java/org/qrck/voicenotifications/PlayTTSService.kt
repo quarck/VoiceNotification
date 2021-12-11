@@ -85,7 +85,7 @@ class TTSSpeaker(val service: PlayTTSService)
 
             val state = PersistentState(service)
             if (state.enableMediaStream) {
-                attribBuilder.setUsage(AudioAttributes.USAGE_ASSISTANT)
+                attribBuilder.setUsage(AudioAttributes.USAGE_MEDIA)
             } else {
                 attribBuilder.setUsage(AudioAttributes.USAGE_VOICE_COMMUNICATION)
             }

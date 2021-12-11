@@ -1,6 +1,5 @@
 package org.qrck.voicenotifications
 
-import android.bluetooth.BluetoothDevice
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
@@ -33,19 +32,8 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun launchNotificationSettings() {
-        val intent = Intent(android.provider.Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS)
-        startActivity(intent)
-    }
-
-    fun onLaunchService(view: android.view.View) {
-        launchNotificationSettings()
-    }
-
-    fun onLaunchBTConfig(view: android.view.View) {
-        val intent = Intent(this, BluetoothDevicesActivity::class.java)
-        startActivity(intent)
-    }
+    fun onLaunchService(view: android.view.View) =
+        startActivity(Intent(android.provider.Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS))
 
     private fun muteFor(durationMillis: Long) {
         val state = PersistentState(this)
@@ -53,28 +41,22 @@ class MainActivity : AppCompatActivity() {
         updateView()
     }
 
-    fun mute8Hours(view: android.view.View) {
-        muteFor(8 * 3600 * 1000L)
-    }
+    fun mute8Hours(view: android.view.View) = muteFor(8 * 3600 * 1000L)
 
-    fun muteOneHour(view: android.view.View) {
-        muteFor(3600 * 1000L)
-    }
+    fun muteOneHour(view: android.view.View) = muteFor(3600 * 1000L)
 
-    fun mute30Mins(view: android.view.View) {
-        muteFor(1800 * 1000L)
-    }
+    fun mute30Mins(view: android.view.View) = muteFor(1800 * 1000L)
 
-    fun mute15Mins(view: android.view.View) {
-        muteFor(900 * 1000L)
-    }
+    fun mute15Mins(view: android.view.View) = muteFor(900 * 1000L)
 
-    fun cancelMute(view: android.view.View) {
-        muteFor(-1)
-    }
+    fun cancelMute(view: android.view.View) = muteFor(-1)
 
-    fun onLaunchSettings(view: android.view.View) {
-        val intent = Intent(this, SettingsActivity::class.java)
-        startActivity(intent)
-    }
+    fun onLaunchSettings(view: android.view.View) =
+        startActivity(Intent(this, SettingsActivity::class.java))
+
+    fun onLaunchDevices(view: android.view.View) =
+        startActivity(Intent(this, BluetoothDevicesActivity::class.java))
+
+    fun onLaunchApps(view: android.view.View) =
+        startActivity(Intent(this, AppListActivity::class.java))
 }
